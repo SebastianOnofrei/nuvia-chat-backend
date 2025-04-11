@@ -7,17 +7,20 @@ import { createWriteStream } from "fs";
 import morgan from "morgan"; // Import morgan
 import chalk from "chalk";
 import handleSocket from "./src/socket/socketHandler.js";
+import connectDB from "./src/config/database.js";
 
 configureDotenv();
 
-// file stream where we write logs - works only on PROD :)
-
 if (process.env.ENVIRONMENT !== "DEV") {
+  // file stream where we write logs - works only on PROD :)
   const accessLogStream = createWriteStream("access.log", { flags: "a" });
 }
 
 // Initialize Express app
 const app = e();
+
+// Connect to Mongo
+connectDB();
 
 // Use middleware
 app.use(cors());
@@ -25,7 +28,6 @@ app.use(e.json());
 app.use(e.urlencoded({ extended: true }));
 
 // Custom format with color
-
 morgan.token("statusColored", (req, res) => {
   const status = res.statusCode;
   if (status >= 500) return chalk.red(status);
