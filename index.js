@@ -1,9 +1,59 @@
-const express = require("express");
-const cors = require("cors");
-const http = require("http");
-const { Server } = require("socket.io");
-const app = express();
+import e from "express";
+import configureDotenv from "./src/config/dotenv.js";
+import cors from "cors";
+import http from "http";
+import { Server } from "socket.io";
+import { createWriteStream } from "fs";
+import morgan from "morgan"; // Import morgan
+import chalk from "chalk";
+import handleSocket from "./src/socket/socketHandler.js";
 
+configureDotenv();
+
+// file stream where we write logs - works only on PROD :)
+
+if (process.env.ENVIRONMENT !== "DEV") {
+  const accessLogStream = createWriteStream("access.log", { flags: "a" });
+}
+
+// Initialize Express app
+const app = e();
+
+// Use middleware
+app.use(cors());
+app.use(e.json());
+app.use(e.urlencoded({ extended: true }));
+
+// Custom format with color
+
+morgan.token("statusColored", (req, res) => {
+  const status = res.statusCode;
+  if (status >= 500) return chalk.red(status);
+  if (status >= 400) return chalk.red(status);
+  if (status >= 300) return chalk.cyan(status);
+  if (status >= 200) return chalk.green(status);
+  return status;
+});
+
+// Colorful format for logging
+const colorFormat = (tokens, req, res) => {
+  return [
+    chalk.gray(tokens.date(req, res, "iso")),
+    chalk.magenta(tokens.method(req, res)),
+    chalk.blue(tokens.url(req, res)),
+    tokens.statusColored(req, res), // Status code with color
+    chalk.white(`${tokens["response-time"](req, res)} ms`),
+  ].join(" ");
+};
+
+if (process.env.ENVIRONMENT === "DEV") {
+  // Console log with custom format (colored)
+  app.use(morgan(colorFormat));
+} else {
+  app.use(morgan("combined", { immediate: true, stream: accessLogStream }));
+}
+
+// Create server and socket.io
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -11,66 +61,15 @@ const io = new Server(server, {
   },
 });
 
-// Use CORS middleware to allow all origins :)
-// #TODO: When deploying frontend to a dedicated URL, add just that URL in the allowed list
+// socketIO handling
+handleSocket(io);
 
-// Store connected users' socket IDs
-let users = {}; // { userId: socketId }
-
-app.use(cors());
-
-// SocketIO server..
-let connectedUsers = 0;
-
-io.on("connection", (socket) => {
-  // Increment the counter when a user connects
-  connectedUsers++;
-  console.log(`A user connected. Total connected users: ${connectedUsers}`);
-
-  socket.emit("welcome", "Hello, welcome to the server!");
-
-  // When a user sends their ID (e.g., username), store the socket ID
-  socket.on("register", (userId) => {
-    users[userId] = socket.id;
-    console.log(`User ${userId} registered with socket ID: ${socket.id}`);
-  });
-
-  // Handle private message
-  socket.on("private_message", (data) => {
-    const { senderId, recipientId, message } = data;
-
-    // Send the message to the recipient if they are online (socket ID is stored)
-    const recipientSocketId = users[recipientId];
-    if (recipientSocketId) {
-      io.to(recipientSocketId).emit("private_message", {
-        senderId,
-        message,
-      });
-      console.log(
-        `Private message from ${senderId} to ${recipientId}: ${message}`
-      );
-    } else {
-      console.log(`User ${recipientId} is not connected.`);
-    }
-  });
-
-  socket.on("disconnect", () => {
-    connectedUsers--;
-    console.log(
-      `A user disconnected. Total connected users: ${connectedUsers}`
-    );
-
-    // Remove the user from the list of connected users
-    for (let userId in users) {
-      if (users[userId] === socket.id) {
-        delete users[userId];
-        console.log(`User ${userId} disconnected`);
-        break;
-      }
-    }
-  });
+// Define routes
+app.get("/", (req, res) => {
+  res.send("Helloooooooooooo");
 });
 
-server.listen(3000, () => {
-  console.log("Server running on port 3000");
+// Start the server
+server.listen(process.env.PORT, () => {
+  console.log(`Server running on port ${process.env.PORT}`);
 });
