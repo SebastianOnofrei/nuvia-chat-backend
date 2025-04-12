@@ -9,6 +9,8 @@ import chalk from "chalk";
 import handleSocket from "./src/socket/socketHandler.js";
 import connectDB from "./src/config/database.js";
 
+import { router as userRouter } from "./src/routes/userRoutes.js";
+
 configureDotenv();
 
 if (process.env.ENVIRONMENT !== "DEV") {
@@ -67,8 +69,10 @@ const io = new Server(server, {
 handleSocket(io);
 
 // Define routes
+
+app.use("/", userRouter);
 app.get("/", (req, res) => {
-  res.send("Helloooooooooooo");
+  res.send("Helloooooooooooooooooooo");
 });
 
 // Start the server
