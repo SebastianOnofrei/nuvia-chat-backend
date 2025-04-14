@@ -2,22 +2,35 @@ import { Router } from "express";
 import {
   createUser,
   deleteUser,
-  readUser,
+  getUser,
   updateUser,
 } from "../controllers/userController.js";
+import { expressjwt } from "express-jwt";
 
 const router = Router();
 
 // Fetch a specific user by ID
-router.get("/users/:id", readUser);
+router.get(
+  "/:id",
+  expressjwt({ secret: process.env.JWT_SECRET, algorithms: ["HS256"] }),
+  getUser
+);
 
 // Create a new user
-router.post("/users", createUser);
+router.post("/", createUser);
 
 // Update a user by ID
-router.put("/users/:id", updateUser);
+router.put(
+  "/:id",
+  expressjwt({ secret: process.env.JWT_SECRET, algorithms: ["HS256"] }),
+  updateUser
+);
 
 // Delete a user by ID
-router.delete("/users/:id", deleteUser);
+router.delete(
+  "/:id",
+  expressjwt({ secret: process.env.JWT_SECRET, algorithms: ["HS256"] }),
+  deleteUser
+);
 
 export { router };

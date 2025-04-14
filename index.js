@@ -10,6 +10,7 @@ import handleSocket from "./src/socket/socketHandler.js";
 import connectDB from "./src/config/database.js";
 
 import { router as userRouter } from "./src/routes/userRoutes.js";
+import { router as loginRouter } from "./src/config/auth.js";
 
 configureDotenv();
 
@@ -70,7 +71,17 @@ handleSocket(io);
 
 // Define routes
 
-app.use("/", userRouter);
+app.use("/login", loginRouter);
+app.use("/user", userRouter);
+
+app.use((err, req, res, next) => {
+  if (err.name === "UnauthorizedError") {
+    res.status(401).json("unauthorized");
+  } else {
+    next();
+  }
+});
+
 app.get("/", (req, res) => {
   res.send("Helloooooooooooooooooooo");
 });

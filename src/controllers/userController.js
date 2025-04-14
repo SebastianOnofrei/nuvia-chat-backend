@@ -41,7 +41,7 @@ const createUser = async (req, res) => {
   }
 };
 
-const readUser = (req, res) => {
+const getUser = (req, res) => {
   const { id } = req.params; // Assuming you're fetching by user ID
   // Fetch the user from DB using `id`
   res.status(200).json({ id, name: "John Doe", email: "john@example.com" });
@@ -74,4 +74,4 @@ const deleteUser = async (req, res) => {
   }
 };
 
-export { createUser, readUser, updateUser, deleteUser };
+export { createUser, getUser, updateUser, deleteUser };
