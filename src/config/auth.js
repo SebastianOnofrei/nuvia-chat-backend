@@ -19,6 +19,7 @@ router.post("/", async (req, res) => {
     }
 
     const payload = {
+      id: user._id,
       email: user.email,
       username: user.username,
       createdAt: user.createdAt,
