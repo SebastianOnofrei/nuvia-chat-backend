@@ -57,7 +57,8 @@ if (process.env.ENVIRONMENT === "DEV") {
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3001", // frontend URL
+    origin: "http://localhost:3001",
+    methods: ["GET", "POST"], // frontend URL
   },
 });
 

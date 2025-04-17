@@ -6,19 +6,20 @@ import {
   updateUser,
 } from "../controllers/userController.js";
 import { expressjwt } from "express-jwt";
+import User from "../models/userModel.js";
 
 const router = Router();
 
 // Get the friends list for the logged-in user
 router.get(
   "/friends",
-  // expressjwt({ secret: process.env.JWT_SECRET, algorithms: ["HS256"] }),
+  expressjwt({ secret: process.env.JWT_SECRET, algorithms: ["HS256"] }),
   async (req, res) => {
     try {
-      const userId = req.user.id;
+      console.log("REQUEST IN FRIENDS...");
+      console.log(req);
 
-      console.log("================== USER ID IN FRIENDS");
-      console.log(userId);
+      const userId = req.auth.id;
 
       const user = await User.findById(userId).populate(
         "friends",

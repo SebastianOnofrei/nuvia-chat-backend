@@ -26,18 +26,20 @@ const handleSocket = (io) => {
 
     console.log("======================= HELLOOOOOOOOOOOOO userID");
     console.log(userId);
-    console.log(users);
 
     users[userId] = socket.id;
-
+    console.log(users);
     console.log(`✅ ${userId} connected.`);
 
     socket.emit("welcome", "Welcome to the socket server!");
 
     // 📨 Handle sending private message
     socket.on("private_message", async ({ recipientId, content }) => {
+      const recipientSocketId = users[recipientId];
+
       try {
         // 1. Save to DB
+        console.log("📩 Incoming message:", { recipientId, content });
         const newMsg = await Message.create({
           sender: userId,
           receiver: recipientId,
