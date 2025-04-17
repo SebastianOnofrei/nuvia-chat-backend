@@ -41,10 +41,29 @@ const createUser = async (req, res) => {
   }
 };
 
-const getUser = (req, res) => {
-  const { id } = req.params; // Assuming you're fetching by user ID
-  // Fetch the user from DB using `id`
-  res.status(200).json({ id, name: "John Doe", email: "john@example.com" });
+const getUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the user by ID
+    const user = await User.findById(id);
+    console.log(user);
+    // Check if the user exists
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Return the user data as JSON response
+    res.status(200).json({
+      id: user._id,
+      username: user.username,
+      email: user.email,
+    });
+  } catch (error) {
+    // Handle any errors that may occur
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 const updateUser = (req, res) => {

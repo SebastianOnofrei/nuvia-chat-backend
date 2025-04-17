@@ -16,9 +16,6 @@ router.get(
   expressjwt({ secret: process.env.JWT_SECRET, algorithms: ["HS256"] }),
   async (req, res) => {
     try {
-      console.log("REQUEST IN FRIENDS...");
-      console.log(req);
-
       const userId = req.auth.id;
 
       const user = await User.findById(userId).populate(
