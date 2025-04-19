@@ -6,13 +6,13 @@ import { Server } from "socket.io";
 import { createWriteStream } from "fs";
 import morgan from "morgan";
 import chalk from "chalk";
-
 import handleSocket from "./src/socket/socketHandler.js";
 import connectDB from "./src/config/database.js";
 
 import { router as userRouter } from "./src/routes/userRoutes.js";
 import { router as loginRouter } from "./src/config/auth.js";
 import { router as friendshipRouter } from "./src/routes/friendshipRoutes.js";
+
 // ✅ Load environment variables
 configureDotenv();
 

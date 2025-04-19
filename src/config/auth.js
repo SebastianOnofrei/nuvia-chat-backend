@@ -23,6 +23,7 @@ router.post("/", async (req, res) => {
       email: user.email,
       username: user.username,
       createdAt: user.createdAt,
+      profilePicture: user.profilePicture,
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET);

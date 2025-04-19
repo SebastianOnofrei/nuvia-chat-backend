@@ -7,8 +7,7 @@ const handleSocket = (io) => {
   // 🔐 Middleware: JWT validation
   io.use((socket, next) => {
     const token = socket.handshake.auth.token;
-    console.log("======================= HELLOOOOOOOOOOOOO TOKEN");
-    console.log(token);
+
     if (!token) return next(new Error("No token"));
 
     try {
@@ -23,9 +22,6 @@ const handleSocket = (io) => {
 
   io.on("connection", (socket) => {
     const userId = socket.userId;
-
-    console.log("======================= HELLOOOOOOOOOOOOO userID");
-    console.log(userId);
 
     users[userId] = socket.id;
     console.log(users);

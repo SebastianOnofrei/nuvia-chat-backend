@@ -55,9 +55,10 @@ const getUser = async (req, res) => {
 
     // Return the user data as JSON response
     res.status(200).json({
-      id: user._id,
+      _id: user._id,
       username: user.username,
       email: user.email,
+      profilePicture: user.profilePicture,
     });
   } catch (error) {
     // Handle any errors that may occur
