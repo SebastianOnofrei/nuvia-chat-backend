@@ -10,30 +10,26 @@ router.post(
   expressjwt({ secret: process.env.JWT_SECRET, algorithms: ["HS256"] }),
   async (req, res) => {
     try {
-      const { friendId } = req.body; // The user to add as a friend
-      const userId = req.user.id; // Logged-in user's ID (from JWT)
+      const { friendEmail } = req.body; // The user to add as a friend
+      const userId = req.auth.id; // Logged-in user's ID (from JWT)
 
-      if (friendId === userId) {
-        return res
-          .status(400)
-          .json({ error: "Cannot add yourself as a friend" });
-      }
+      // TODO: Add verification on Frontend to not add the same Email as your user Email :)
 
       // Find the current user and the friend
       const user = await User.findById(userId);
-      const friend = await User.findById(friendId);
+      const friend = await User.findOne({ email: friendEmail });
 
       if (!friend) {
         return res.status(404).json({ error: "Friend not found" });
       }
 
       // Add the friend to the user's friends list
-      if (!user.friends.includes(friendId)) {
-        user.friends.push(friendId);
+      if (!user.friends.includes(friend.id)) {
+        user.friends.push(friend.id);
         await user.save();
       }
 
-      // Optionally, add the user to the friend's list as well (mutual friendship)
+      // We also add the user to the friend's list as well (mutual friendship)
       if (!friend.friends.includes(userId)) {
         friend.friends.push(userId);
         await friend.save();

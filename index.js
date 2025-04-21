@@ -12,6 +12,8 @@ import connectDB from "./src/config/database.js";
 import { router as userRouter } from "./src/routes/userRoutes.js";
 import { router as loginRouter } from "./src/config/auth.js";
 import { router as friendshipRouter } from "./src/routes/friendshipRoutes.js";
+import { router as messageRouter } from "./src/routes/messageRoutes.js";
+import { router as conversationRouter } from "./src/routes/conversationRoutes.js";
 
 // ✅ Load environment variables
 configureDotenv();
@@ -69,6 +71,8 @@ handleSocket(io);
 app.use("/login", loginRouter);
 app.use("/user", userRouter);
 app.use("/friendship", friendshipRouter);
+app.use("/message", messageRouter);
+app.use("/conversation", conversationRouter);
 
 // 🛡️ Error middleware
 app.use((err, req, res, next) => {

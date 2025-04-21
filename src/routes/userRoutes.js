@@ -35,7 +35,7 @@ router.get(
 
       const user = await User.findById(userId).populate(
         "friends",
-        "username email _id"
+        "username email _id profilePicture"
       );
 
       if (!user) {
@@ -60,6 +60,7 @@ router.get(
 // Create a new user
 router.post("/", createUser);
 
+// update avatar
 router.post(
   "/update-avatar",
   expressjwt({ secret: process.env.JWT_SECRET, algorithms: ["HS256"] }), // 🔐 protect it
