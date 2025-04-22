@@ -17,7 +17,7 @@ const createConversation = async (senderId, receiverId) => {
 };
 
 // Create or find a conversation between two users
-export const getConversationId = async (senderId, receiverId) => {
+const getConversationId = async (senderId, receiverId) => {
   try {
     const conversation = await Conversation.findOne({
       participants: { $all: [senderId, receiverId] },
@@ -30,12 +30,15 @@ export const getConversationId = async (senderId, receiverId) => {
 };
 
 // Function to send a message
-const sendMessage = async (senderId, receiverId, content) => {
+const sendUserMessage = async (senderId, receiverId, content) => {
   try {
     // Step 1: Check if a conversation already exists
     let conversation = await Conversation.findOne({
       participants: { $all: [senderId, receiverId] },
     });
+
+    console.log("=================== AVEM CONVERSATION");
+    console.log(conversation);
 
     // Step 2: If no conversation exists, create a new one
     if (!conversation) {
@@ -91,8 +94,8 @@ const getAllMessagesInConversation = async (conversationId) => {
   }
 };
 
-export default {
-  sendMessage,
+export {
+  sendUserMessage,
   getLastMessageInConversation,
   getAllMessagesInConversation,
   createConversation,

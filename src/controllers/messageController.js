@@ -1,15 +1,14 @@
-import messageService from "../services/messageService.js";
+import {
+  sendUserMessage,
+  getLastMessageInConversation,
+} from "../services/messageService.js";
 
 // Controller to send a message
 const sendMessage = async (req, res) => {
   const { senderId, receiverId, content } = req.body;
 
   try {
-    const message = await messageService.sendMessage(
-      senderId,
-      receiverId,
-      content
-    );
+    const message = await sendUserMessage(senderId, receiverId, content);
 
     if (message) {
       return res.status(200).json(message); // Send the sent message as response
@@ -27,9 +26,7 @@ const getLastMessage = async (req, res) => {
   const { conversationId } = req.params;
 
   try {
-    const lastMessage = await messageService.getLastMessageInConversation(
-      conversationId
-    );
+    const lastMessage = await getLastMessageInConversation(conversationId);
 
     if (lastMessage) {
       return res.status(200).json(lastMessage);

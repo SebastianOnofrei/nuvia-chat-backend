@@ -30,34 +30,53 @@ const handleSocket = (io) => {
     socket.emit("welcome", "Welcome to the socket server!");
 
     // 📨 Handle sending private message
-    socket.on("private_message", async ({ recipientId, content }) => {
-      const recipientSocketId = users[recipientId];
+    socket.on(
+      "private_message",
+      async ({ recipientId, content, conversationId }) => {
+        const recipientSocketId = users[recipientId];
 
-      try {
-        // 1. Save to DB
-        console.log("📩 Incoming message:", { recipientId, content });
-        const newMsg = await Message.create({
-          sender: userId,
-          receiver: recipientId,
-          content,
-        });
-
-        // 2. Send to recipient if online
-        const recipientSocket = users[recipientId];
-        if (recipientSocket) {
-          io.to(recipientSocket).emit("private_message", {
-            senderId: userId,
+        try {
+          // 1. Save message to DB, including conversationId
+          console.log("📩 Incoming message:", {
+            recipientId,
             content,
-            timestamp: newMsg.timestamp,
+            conversationId,
           });
-          console.log(`📤 ${userId} → ${recipientId}: ${content}`);
-        } else {
-          console.log(`📥 Saved for offline user ${recipientId}`);
+
+          // If conversationId is not provided, create a new one (you can define your own logic here for handling conversations)
+          if (!conversationId) {
+            console.log(
+              "No conversationId provided, generating a new conversation."
+            );
+            // Handle conversation creation logic here or fetch it based on sender and receiver.
+            // If it's a new conversation, create one, else just use the existing conversationId.
+          }
+
+          const newMsg = await Message.create({
+            senderId: userId,
+            receiverId: recipientId,
+            content,
+            conversationId, // Save the conversationId
+          });
+
+          // 2. Send the message to recipient if they are online
+          const recipientSocket = users[recipientId];
+          if (recipientSocket) {
+            io.to(recipientSocket).emit("private_message", {
+              senderId: userId,
+              content,
+              timestamp: newMsg.timestamp,
+              conversationId: conversationId, // Include the conversationId in the response
+            });
+            console.log(`📤 ${userId} → ${recipientId}: ${content}`);
+          } else {
+            console.log(`📥 Saved for offline user ${recipientId}`);
+          }
+        } catch (err) {
+          console.error("❌ Error sending message:", err.message);
         }
-      } catch (err) {
-        console.error("❌ Error sending message:", err.message);
       }
-    });
+    );
 
     // 🔌 Handle disconnect
     socket.on("disconnect", () => {

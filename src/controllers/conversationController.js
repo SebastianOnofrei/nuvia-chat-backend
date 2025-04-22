@@ -1,4 +1,7 @@
-import { getConversationId } from "../services/messageService.js";
+import {
+  getAllMessagesInConversation,
+  getConversationId,
+} from "../services/messageService.js";
 
 const getConversation = async (req, res) => {
   try {
@@ -9,7 +12,7 @@ const getConversation = async (req, res) => {
     if (conversation) {
       return res.status(200).json(conversation);
     } else {
-      return res.status(404).json({ message: "No conversation found" });
+      return res.status(200).json({ message: "No conversation found" });
     }
   } catch (error) {
     console.error("Error in getLastMessage:", error);
@@ -17,4 +20,18 @@ const getConversation = async (req, res) => {
   }
 };
 
-export { getConversation };
+const getConversationHistory = async (req, res) => {
+  const conversationId = req.query.conversationId;
+
+  const conversationHistory = await getAllMessagesInConversation(
+    conversationId
+  );
+
+  if (conversationHistory) {
+    return res.status(200).json(conversationHistory);
+  } else {
+    return res.status(200).json({ message: "No conversation history found" });
+  }
+};
+
+export { getConversation, getConversationHistory };
